@@ -3,55 +3,128 @@ Advanced MERN application for managing projects, users, and files with role-base
 
 This README documents how to run the app locally, the API surface, environment variables, and troubleshooting tips.
 
+## Requirements Checklist ✅
+
+### Authentication & Authorization (20%)
+- ✅ JWT-based login & signup
+- ✅ Password hashing with bcryptjs
+- ✅ Role-based access: Admin & User
+- ✅ Protected endpoints with auth middleware
+- ✅ Token verification and expiration
+
+### Project Module - CRUD (20%)
+- ✅ Create projects (admin only)
+- ✅ Read/list projects (with role-based filtering)
+- ✅ Update projects (admin only)
+- ✅ Delete projects (admin only)
+- ✅ All required fields: title, description, startDate, endDate, status, assignedUsers, attachments
+
+### File Upload (10%)
+- ✅ Multer integration with local storage
+- ✅ Max 3 attachments per project
+- ✅ 5MB max per file
+- ✅ File metadata tracking
+
+### Dashboard & Analytics (10%)
+- ✅ Total users count (admin view)
+- ✅ Total projects count
+- ✅ Project count by status
+- ✅ Projects ending within 7 days
+- ✅ Role-based data visibility
+
+### User Module (20%)
+- ✅ Admin: create, update, delete users
+- ✅ Admin: change user roles
+- ✅ User: update own profile
+- ✅ User: password change
+- ✅ Admin-only user management
+
+### Code Quality & Security (20%)
+- ✅ Error handling middleware
+- ✅ Input validation
+- ✅ Protected routes
+- ✅ Clean code structure
+- ✅ Async/await pattern
+
+### Frontend UI/UX
+- ✅ Login/Signup page
+- ✅ Dashboard with analytics
+- ✅ Project list & details
+- ✅ Project creation form
+- ✅ User management interface
+- ✅ Profile page
+- ✅ Status updates
+- ✅ File download from attachments
+- ✅ Search & filtering
+- ✅ Theme toggle (Light/Dark)
+- ✅ Responsive layout
+
 ## Features
 
 - JWT authentication with `bcryptjs` password hashing
-- Role-based access: `admin` and `user`
-- User management (admin): create, update, delete, change roles
-- User profile update for authenticated users
-- Project CRUD (admin) with up to 3 file attachments (Multer)
-- Assigned users can view their projects and update project status
-- Dashboard analytics: total users, total projects, status counts, projects ending within 7 days
-- Search and status filtering for projects
-- Light/dark theme toggle on the frontend
+- Role-based access control: `admin` and `user`
+- **User Management (Admin only)**: create, update, delete users; change user roles
+- **User Profile**: authenticated users can update own profile, change password
+- **Project CRUD (Admin only)**: create, read, update, delete projects with full details
+- **Project Status Updates (All users)**: assigned users can update project status
+- **File Upload**: Multer integration with up to 3 attachments per project (local storage)
+- **Dashboard Analytics**: 
+  - Total users (admin view)
+  - Total projects
+  - Project count by status (Pending, In-Progress, Completed)
+  - Projects ending within 7 days
+- **Search & Filtering**: Filter projects by status, search by title
+- **Theme Toggle**: Light/dark mode persistence on frontend
 
 ## Tech Stack
 
-- Backend: Node.js (ESM), Express, MongoDB (Mongoose), JWT, Multer
-- Frontend: React, Vite, React Router, Axios
+- **Backend**: Node.js (ESM), Express, MongoDB (Mongoose), JWT, Multer, bcryptjs
+- **Frontend**: React 18, Vite, React Router, Axios, Lucide React icons
+- **Database**: MongoDB (required locally or via connection string)
 
 ## Prerequisites
 
 - Node.js 18+ and npm
-- (Optional) MongoDB running locally or a connection string
+- **MongoDB running locally** on port 27017, or set a valid `MONGO_URI` connection string
 
-Note: The backend will attempt to connect to `MONGO_URI`. If it's not available, the server will automatically start an in-memory MongoDB (development only) so you can run the project without a local MongoDB instance.
+⚠️ **Important**: MongoDB must be running. The backend requires a valid database connection and will not start without it.
 
-## Environment
+To start MongoDB locally (macOS with Homebrew):
+```bash
+brew services start mongodb-community
+```
 
-Copy example env files and adjust values as needed:
+To verify MongoDB is running:
+```bash
+lsof -iTCP:27017 -sTCP:LISTEN -P -n
+```
+
+## Environment Setup
+
+Copy example env files and adjust values:
 
 ```bash
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 ```
 
-Important variables (backend/.env):
+### Backend Environment Variables (.env)
 
-- `PORT` — backend port (default: 5050)
-- `MONGO_URI` — MongoDB connection string (optional; if missing or unreachable, an in-memory DB is used)
-- `JWT_SECRET` — JWT signing secret (set to a strong random string)
-- `CLIENT_URL` — frontend origin used in production CORS
+- `PORT` — Backend port (default: `5050`)
+- `MONGO_URI` — MongoDB connection string (required; must connect to local or remote MongoDB)
+  - Local example: `mongodb://127.0.0.1:27017/project_management_system`
+- `JWT_SECRET` — JWT signing secret (set to a long random string for security)
+- `CLIENT_URL` — Frontend origin for CORS (default: `http://localhost:5173`)
 
-Frontend env (frontend/.env):
+### Frontend Environment Variables (optional)
 
-- `VITE_API_URL` — API base (default: `http://localhost:5050/api`)
-- `VITE_UPLOAD_URL` — upload base (default: `http://localhost:5050`)
+- `VITE_API_URL` — API base URL (default: `http://localhost:5050/api`)
+- `VITE_UPLOAD_URL` — Upload base URL (default: `http://localhost:5050`)
 
-## Install
+## Installation & Development
 
-Install dependencies for both backend and frontend (from repo root):
-
+### Step 1: Install Dependencies
+From the repository root:
 ```bash
 npm run install:all
 ```
@@ -63,49 +136,61 @@ npm install --prefix backend
 npm install --prefix frontend
 ```
 
-## Development
+### Step 2: Ensure MongoDB is Running
+**Critical**: MongoDB must be running before starting the backend.
 
-Start both backend and frontend (from repo root):
-
+**macOS (Homebrew)**:
 ```bash
-npm run dev
+brew services start mongodb-community
 ```
 
-This runs the backend on `http://localhost:5050` and the frontend dev server on `http://localhost:5173` by default. The frontend will automatically pick another free port if `5173` is in use.
-
-If you prefer to run servers separately:
-
+**Verify MongoDB is listening**:
 ```bash
-npm start --prefix backend
-npm run dev --prefix frontend
+lsof -iTCP:27017 -sTCP:LISTEN -P -n | grep mongod
 ```
 
-## Build (Production)
-
-Build frontend:
-
-```bash
-npm run build --prefix frontend
-```
-
-Serve backend (production):
-
-```bash
-npm start --prefix backend
-```
-
-## Seeding Demo Data
-
-The backend includes a seed script to populate demo users and projects. Run:
-
+### Step 3: Seed Demo Data (Optional)
+Populate database with demo users and projects:
 ```bash
 npm run seed --prefix backend
 ```
 
-Demo accounts (seeded):
+Demo credentials:
+- **Admin**: `admin@example.com` / `password123`
+- **User**: `user@example.com` / `password123`
 
-- Admin: `admin@example.com` / `password123`
-- User: `user@example.com` / `password123`
+### Step 4: Start Development Servers
+From the repository root, start both backend and frontend:
+```bash
+npm run dev
+```
+
+**Servers**:
+- **Backend**: `http://localhost:5050`
+- **Frontend**: `http://localhost:5173`
+
+**Alternative**: Run separately in different terminals:
+```bash
+# Terminal 1: Backend
+npm start --prefix backend
+
+# Terminal 2: Frontend
+npm run dev --prefix frontend
+```
+
+## Production Build
+
+**Build frontend** (creates optimized dist folder):
+```bash
+npm run build --prefix frontend
+```
+
+**Start backend in production mode**:
+```bash
+npm start --prefix backend
+```
+
+Ensure `NODE_ENV=production` and all required environment variables are set in `backend/.env`.
 
 ## API Reference
 
@@ -163,22 +248,83 @@ Base URL (development): `http://localhost:5050/api`
 }
 ```
 
-## File uploads
+## File Uploads
 
-- Attachments are stored under `backend/uploads/` during development. Multer limits: max 3 files and 5MB each.
+- Attachments stored locally under `backend/uploads/` during development
+- Multer configuration: max 3 files per project, 5MB per file
+- File paths accessible via `/uploads/<filename>` endpoint
 
-## Models (summary)
+## Models
 
-- `User` — `{ name, email, password, role, phone, department }`
-- `Project` — `{ title, description, startDate, endDate, status, assignedUsers, attachments, createdBy }`
+### User
+```javascript
+{
+  name: String,
+  email: String (unique),
+  password: String (hashed with bcryptjs),
+  role: "admin" | "user",
+  phone: String,
+  department: String,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
 
-## Development notes & troubleshooting
+### Project
+```javascript
+{
+  title: String,
+  description: String,
+  startDate: Date,
+  endDate: Date,
+  status: "Pending" | "In-Progress" | "Completed",
+  assignedUsers: [ObjectId], // references to User
+  attachments: [
+    {
+      originalName: String,
+      filename: String,
+      path: String,
+      mimetype: String,
+      size: Number
+    }
+  ],
+  createdBy: ObjectId, // reference to User (admin)
+  createdAt: Date,
+  updatedAt: Date
+}
+```
 
-- If backend fails to connect to your local MongoDB, it will use an in-memory MongoDB (development fallback). To use a persistent DB set `MONGO_URI` in `backend/.env`.
-- If ports `5050` (backend) or `5173` (frontend) are in use, the dev servers will try next available ports. Check console output for the actual URLs.
-- To clear generated artifacts after development, delete `node_modules/` and `frontend/dist/` if present and reinstall as needed.
+## Role-Based Access Control (RBAC)
 
-## Postman
+### Admin Permissions
+- ✅ Create, read, update, delete users
+- ✅ Change user roles
+- ✅ Create, read, update, delete projects
+- ✅ Assign/unassign users to projects
+- ✅ Upload attachments (max 3 per project)
+- ✅ View all projects in dashboard
+- ✅ View all users
+- ✅ Update own profile
+
+### User Permissions
+- ✅ View assigned projects only
+- ✅ Update project status (for assigned projects)
+- ✅ View own profile
+- ✅ Update own profile (name, phone, department, password)
+- ❌ Cannot create projects
+- ❌ Cannot manage users
+- ❌ Cannot assign/unassign users
+
+## Development notes & Troubleshooting
+
+- **MongoDB must be running** before starting the backend. Verify with: `lsof -iTCP:27017 -sTCP:LISTEN -P -n`
+- If you need to start MongoDB (macOS Homebrew): `brew services start mongodb-community`
+- If ports are in use (5050 for backend, 5173 for frontend), the dev servers will use next available. Check console output.
+- For fresh setup after development, remove `node_modules/` folders and reinstall: `npm run install:all`
+- All API endpoints require JWT authentication except `/api/auth/signup` and `/api/auth/login`
+
+## Postman Collection
+
 
 Import `postman/Project_Management_System.postman_collection.json` and set the `baseUrl` collection variable to your backend URL (e.g., `http://localhost:5050`).
 
