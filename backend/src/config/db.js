@@ -1,37 +1,26 @@
 import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
 
-let mongodInstance;
+const DEFAULT_LOCAL_URI = "mongodb://127.0.0.1:27017/project_management_system";
 
 export const connectDB = async () => {
-  let uri = process.env.MONGO_URI;
+  const envUri = process.env.MONGO_URI?.trim();
+  const uri = envUri || DEFAULT_LOCAL_URI;
 
-  // First try connecting to configured URI (if any). If it fails, fall back to in-memory.
-  if (uri) {
-    try {
-      await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
-      console.log("MongoDB connected to", uri);
-      return;
-    } catch (err) {
-      console.warn(`Failed to connect to MONGO_URI (${uri}): ${err.message}`);
-      console.warn("Falling back to in-memory MongoDB for development");
-    }
-  } else {
-    console.warn("MONGO_URI not set — starting in-memory MongoDB for development");
+  if (!envUri) {
+    console.warn(
+      `MONGO_URI is not set. Defaulting to local MongoDB at ${DEFAULT_LOCAL_URI}. ` +
+        "Set MONGO_URI in backend/.env to use a different database."
+    );
   }
 
-  // Start in-memory MongoDB and connect
-  mongodInstance = await MongoMemoryServer.create();
-  globalThis.__MONGOD_INSTANCE__ = mongodInstance;
-  uri = mongodInstance.getUri();
-  await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
-  console.log("MongoDB connected (in-memory)");
-};
-
-export const stopInMemoryMongo = async () => {
-  if (mongodInstance) {
-    await mongodInstance.stop();
-    mongodInstance = null;
-    delete globalThis.__MONGOD_INSTANCE__;
+  try {
+    await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
+    console.log("MongoDB connected to", uri);
+  } catch (err) {
+    console.error(`Failed to connect to MongoDB at ${uri}: ${err.message}`);
+    console.error(
+      "Make sure MongoDB is running on localhost:27017 or set a valid MONGO_URI in backend/.env."
+    );
+    throw err;
   }
 };
