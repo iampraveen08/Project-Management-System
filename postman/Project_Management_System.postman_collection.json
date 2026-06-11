@@ -1,0 +1,116 @@
+{
+  "info": {
+    "name": "Project Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "token", "value": "" },
+    { "key": "projectId", "value": "" },
+    { "key": "userId", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Signup First Admin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/signup"
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["const json = pm.response.json();", "if (json.token) pm.collectionVariables.set('token', json.token);"], "type": "text/javascript" } }]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["const json = pm.response.json();", "if (json.token) pm.collectionVariables.set('token', json.token);"], "type": "text/javascript" } }]
+        },
+        { "name": "Me", "request": { "method": "GET", "url": "{{baseUrl}}/api/auth/me" } }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        { "name": "List Users", "request": { "method": "GET", "url": "{{baseUrl}}/api/users" } },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Project Member\",\n  \"email\": \"member@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"user\",\n  \"department\": \"Engineering\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users"
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["const json = pm.response.json();", "if (json._id) pm.collectionVariables.set('userId', json._id);"], "type": "text/javascript" } }]
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Updated Name\",\n  \"department\": \"Delivery\"\n}" },
+            "url": "{{baseUrl}}/api/users/profile"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        { "name": "List Projects", "request": { "method": "GET", "url": "{{baseUrl}}/api/projects" } },
+        {
+          "name": "Create Project",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Client Portal Build", "type": "text" },
+                { "key": "description", "value": "Build project tracking workflows.", "type": "text" },
+                { "key": "startDate", "value": "2026-06-11", "type": "text" },
+                { "key": "endDate", "value": "2026-06-18", "type": "text" },
+                { "key": "status", "value": "Pending", "type": "text" },
+                { "key": "assignedUsers", "value": "[\"{{userId}}\"]", "type": "text" },
+                { "key": "attachments", "type": "file", "src": "" }
+              ]
+            },
+            "url": "{{baseUrl}}/api/projects"
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["const json = pm.response.json();", "if (json._id) pm.collectionVariables.set('projectId', json._id);"], "type": "text/javascript" } }]
+        },
+        { "name": "Get Project", "request": { "method": "GET", "url": "{{baseUrl}}/api/projects/{{projectId}}" } },
+        {
+          "name": "Update Status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"In-Progress\"\n}" },
+            "url": "{{baseUrl}}/api/projects/{{projectId}}/status"
+          }
+        },
+        { "name": "Delete Project", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/projects/{{projectId}}" } }
+      ]
+    },
+    { "name": "Dashboard", "item": [{ "name": "Analytics", "request": { "method": "GET", "url": "{{baseUrl}}/api/dashboard" } }] }
+  ]
+}
