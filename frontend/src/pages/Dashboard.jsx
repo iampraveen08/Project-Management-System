@@ -7,11 +7,16 @@ import { useAuth } from "../context/AuthContext";
 export default function Dashboard() {
   const { isAdmin } = useAuth();
   const [data, setData] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    api.get("/dashboard").then(({ data }) => setData(data));
+    api
+      .get("/dashboard")
+      .then(({ data }) => setData(data))
+      .catch((err) => setError(err.response?.data?.message || "Could not load dashboard"));
   }, []);
 
+  if (error) return <p className="alert">{error}</p>;
   if (!data) return <p className="muted">Loading dashboard...</p>;
 
   return (

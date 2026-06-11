@@ -2,5 +2,7 @@ node_modules/
 dist/
 .env
 *.log
+.mongo-data/
 backend/uploads/*
 !backend/uploads/.gitkeep
+.mongo-data/

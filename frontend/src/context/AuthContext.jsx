@@ -3,8 +3,17 @@ import api from "../api/client";
 
 const AuthContext = createContext(null);
 
+const readStoredAuth = () => {
+  try {
+    return JSON.parse(localStorage.getItem("pms_auth") || "null");
+  } catch {
+    localStorage.removeItem("pms_auth");
+    return null;
+  }
+};
+
 export const AuthProvider = ({ children }) => {
-  const [auth, setAuth] = useState(() => JSON.parse(localStorage.getItem("pms_auth") || "null"));
+  const [auth, setAuth] = useState(readStoredAuth);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -34,7 +43,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const updateUser = (user) => setAuth((current) => ({ ...current, user }));
+  const updateUser = (user) => setAuth((current) => ({ ...(current || {}), user }));
   const logout = () => setAuth(null);
 
   const value = useMemo(
@@ -45,4 +54,10 @@ export const AuthProvider = ({ children }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
+  return context;
+};

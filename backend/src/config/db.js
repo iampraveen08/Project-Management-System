@@ -6,6 +6,8 @@ export const connectDB = async () => {
     throw new Error("MONGO_URI is required");
   }
 
-  await mongoose.connect(uri);
+  await mongoose.connect(uri, {
+    serverSelectionTimeoutMS: 5000
+  });
   console.log("MongoDB connected");
 };

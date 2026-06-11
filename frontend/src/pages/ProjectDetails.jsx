@@ -5,7 +5,7 @@ import api from "../api/client";
 import StatusBadge from "../components/StatusBadge";
 import { useAuth } from "../context/AuthContext";
 
-const uploadBase = import.meta.env.VITE_UPLOAD_URL || "http://localhost:5000";
+const uploadBase = import.meta.env.VITE_UPLOAD_URL || "http://localhost:5050";
 
 export default function ProjectDetails() {
   const { id } = useParams();
@@ -13,11 +13,16 @@ export default function ProjectDetails() {
   const [project, setProject] = useState(null);
   const [status, setStatus] = useState("Pending");
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const load = async () => {
-    const { data } = await api.get(`/projects/${id}`);
-    setProject(data);
-    setStatus(data.status);
+    try {
+      const { data } = await api.get(`/projects/${id}`);
+      setProject(data);
+      setStatus(data.status);
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not load project");
+    }
   };
 
   useEffect(() => {
@@ -25,11 +30,17 @@ export default function ProjectDetails() {
   }, [id]);
 
   const saveStatus = async () => {
-    const { data } = await api.patch(`/projects/${id}/status`, { status });
-    setProject(data);
-    setMessage("Status updated");
+    try {
+      const { data } = await api.patch(`/projects/${id}/status`, { status });
+      setProject(data);
+      setMessage("Status updated");
+      setError("");
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not update status");
+    }
   };
 
+  if (error && !project) return <p className="alert">{error}</p>;
   if (!project) return <p className="muted">Loading project...</p>;
 
   return (
@@ -66,6 +77,7 @@ export default function ProjectDetails() {
           </select>
           <button className="primary" onClick={saveStatus}><Save size={17} />Save</button>
         </div>
+        {error && <p className="alert">{error}</p>}
         {message && <p className="success">{message}</p>}
         {isAdmin && <p className="muted">Admins can also update full project details from the project list workflow.</p>}
       </div>

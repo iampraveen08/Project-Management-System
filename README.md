@@ -62,7 +62,9 @@ npm run dev
 
 Frontend: `http://localhost:5173`
 
-Backend: `http://localhost:5000`
+Backend: `http://localhost:5050`
+
+The backend uses `5050` because port `5000` is commonly occupied by macOS Control Center/AirPlay.
 
 ## API Overview
 
@@ -105,4 +107,4 @@ Dashboard:
 
 ## Postman
 
-Import `postman/Project_Management_System.postman_collection.json`. Set the collection variable `baseUrl` to `http://localhost:5000`. Login requests automatically store the JWT token in the `token` collection variable.
+Import `postman/Project_Management_System.postman_collection.json`. Set the collection variable `baseUrl` to `http://localhost:5050`. Login requests automatically store the JWT token in the `token` collection variable.

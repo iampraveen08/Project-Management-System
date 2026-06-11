@@ -24,14 +24,23 @@ export default function Projects() {
   const [error, setError] = useState("");
 
   const loadProjects = async () => {
-    const params = Object.fromEntries(Object.entries(filters).filter(([, value]) => value));
-    const { data } = await api.get("/projects", { params });
-    setProjects(data);
+    try {
+      const params = Object.fromEntries(Object.entries(filters).filter(([, value]) => value));
+      const { data } = await api.get("/projects", { params });
+      setProjects(data);
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not load projects");
+    }
   };
 
   useEffect(() => {
     loadProjects();
-    if (isAdmin) api.get("/users").then(({ data }) => setUsers(data));
+    if (isAdmin) {
+      api
+        .get("/users")
+        .then(({ data }) => setUsers(data))
+        .catch((err) => setError(err.response?.data?.message || "Could not load users"));
+    }
   }, [isAdmin]);
 
   const createProject = async (event) => {
@@ -52,8 +61,12 @@ export default function Projects() {
 
   const remove = async (id) => {
     if (!confirm("Delete this project?")) return;
-    await api.delete(`/projects/${id}`);
-    loadProjects();
+    try {
+      await api.delete(`/projects/${id}`);
+      loadProjects();
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not delete project");
+    }
   };
 
   return (
@@ -72,6 +85,7 @@ export default function Projects() {
             <button onClick={loadProjects}>Apply</button>
           </div>
         </div>
+        {error && <p className="alert">{error}</p>}
         <div className="table">
           {projects.map((project) => (
             <div className="tableRow" key={project._id}>

@@ -13,9 +13,10 @@ import { errorHandler, notFound } from "./middleware/error.js";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5050;
 
-app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
+const corsOptions = { origin: process.env.NODE_ENV === "production" ? process.env.CLIENT_URL : true };
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));

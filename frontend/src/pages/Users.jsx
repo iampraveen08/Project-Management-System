@@ -10,8 +10,12 @@ export default function Users() {
   const [error, setError] = useState("");
 
   const load = async () => {
-    const { data } = await api.get("/users");
-    setUsers(data);
+    try {
+      const { data } = await api.get("/users");
+      setUsers(data);
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not load users");
+    }
   };
 
   useEffect(() => {
@@ -31,20 +35,29 @@ export default function Users() {
   };
 
   const update = async (user, field, value) => {
-    const { data } = await api.put(`/users/${user._id}`, { ...user, [field]: value });
-    setUsers((current) => current.map((item) => (item._id === data._id ? data : item)));
+    try {
+      const { data } = await api.put(`/users/${user._id}`, { ...user, [field]: value });
+      setUsers((current) => current.map((item) => (item._id === data._id ? data : item)));
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not update user");
+    }
   };
 
   const remove = async (id) => {
     if (!confirm("Delete this user?")) return;
-    await api.delete(`/users/${id}`);
-    load();
+    try {
+      await api.delete(`/users/${id}`);
+      load();
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not delete user");
+    }
   };
 
   return (
     <section className="pageGrid two">
       <div className="panel wide">
         <h2>User management</h2>
+        {error && <p className="alert">{error}</p>}
         <div className="table">
           {users.map((user) => (
             <div className="tableRow users" key={user._id}>
