@@ -1,202 +1,199 @@
 # Project Management System
-Advanced MERN application for managing projects, users, and files with role-based access.
 
-This README documents how to run the app locally, the API surface, environment variables, and troubleshooting tips.
+A full-stack project management app built with React, Vite, Express, and MongoDB. It supports role-based access, user management, project CRUD operations, file uploads, and dashboard analytics.
 
-## Requirements Checklist ✅
+## Key Features
 
-### Authentication & Authorization (20%)
-- ✅ JWT-based login & signup
-- ✅ Password hashing with bcryptjs
-- ✅ Role-based access: Admin & User
-- ✅ Protected endpoints with auth middleware
-- ✅ Token verification and expiration
-
-### Project Module - CRUD (20%)
-- ✅ Create projects (admin only)
-- ✅ Read/list projects (with role-based filtering)
-- ✅ Update projects (admin only)
-- ✅ Delete projects (admin only)
-- ✅ All required fields: title, description, startDate, endDate, status, assignedUsers, attachments
-
-### File Upload (10%)
-- ✅ Multer integration with local storage
-- ✅ Max 3 attachments per project
-- ✅ 5MB max per file
-- ✅ File metadata tracking
-
-### Dashboard & Analytics (10%)
-- ✅ Total users count (admin view)
-- ✅ Total projects count
-- ✅ Project count by status
-- ✅ Projects ending within 7 days
-- ✅ Role-based data visibility
-
-### User Module (20%)
-- ✅ Admin: create, update, delete users
-- ✅ Admin: change user roles
-- ✅ User: update own profile
-- ✅ User: password change
-- ✅ Admin-only user management
-
-### Code Quality & Security (20%)
-- ✅ Error handling middleware
-- ✅ Input validation
-- ✅ Protected routes
-- ✅ Clean code structure
-- ✅ Async/await pattern
-
-### Frontend UI/UX
-- ✅ Login/Signup page
-- ✅ Dashboard with analytics
-- ✅ Project list & details
-- ✅ Project creation form
-- ✅ User management interface
-- ✅ Profile page
-- ✅ Status updates
-- ✅ File download from attachments
-- ✅ Search & filtering
-- ✅ Theme toggle (Light/Dark)
-- ✅ Responsive layout
-
-## Features
-
-- JWT authentication with `bcryptjs` password hashing
-- Role-based access control: `admin` and `user`
-- **User Management (Admin only)**: create, update, delete users; change user roles
-- **User Profile**: authenticated users can update own profile, change password
-- **Project CRUD (Admin only)**: create, read, update, delete projects with full details
-- **Project Status Updates (All users)**: assigned users can update project status
-- **File Upload**: Multer integration with up to 3 attachments per project (local storage)
-- **Dashboard Analytics**: 
-  - Total users (admin view)
-  - Total projects
-  - Project count by status (Pending, In-Progress, Completed)
-  - Projects ending within 7 days
-- **Search & Filtering**: Filter projects by status, search by title
-- **Theme Toggle**: Light/dark mode persistence on frontend
+- JWT authentication and protected routes
+- Role-based access: `admin` and `user`
+- Admin user management: create, update, delete users
+- Project management: create, read, update, delete projects
+- Project status updates for assigned users
+- File uploads for project attachments (local storage)
+- Dashboard metrics for total users, projects, and statuses
+- React frontend with dark/light mode and responsive layout
 
 ## Tech Stack
 
-- **Backend**: Node.js (ESM), Express, MongoDB (Mongoose), JWT, Multer, bcryptjs
-- **Frontend**: React 18, Vite, React Router, Axios, Lucide React icons
-- **Database**: MongoDB (required locally or via connection string)
+- Backend: Node.js, Express, MongoDB, Mongoose, JWT, Multer
+- Frontend: React, Vite, Axios, React Router
+- Database: MongoDB
+
+## Repository Structure
+
+- `/backend`: Express API server
+- `/frontend`: React application
+- `/uploads`: Stored project attachment files
+- `/scripts/dev.mjs`: Start backend and frontend together
 
 ## Prerequisites
 
 - Node.js 18+ and npm
-- **MongoDB running locally** on port 27017, or set a valid `MONGO_URI` connection string
+- MongoDB running locally or accessible via `MONGO_URI`
 
-⚠️ **Important**: MongoDB must be running. The backend requires a valid database connection and will not start without it.
+## Setup
 
-To start MongoDB locally (macOS with Homebrew):
-```bash
-brew services start mongodb-community
-```
+### 1. Install dependencies
 
-To verify MongoDB is running:
-```bash
-lsof -iTCP:27017 -sTCP:LISTEN -P -n
-```
-
-## Environment Setup
-
-Copy example env files and adjust values:
-
-```bash
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
-```
-
-### Backend Environment Variables (.env)
-
-- `PORT` — Backend port (default: `5050`)
-- `MONGO_URI` — MongoDB connection string (required; must connect to local or remote MongoDB)
-  - Local example: `mongodb://127.0.0.1:27017/project_management_system`
-- `JWT_SECRET` — JWT signing secret (set to a long random string for security)
-- `CLIENT_URL` — Frontend origin for CORS (default: `http://localhost:5173`)
-
-### Frontend Environment Variables (optional)
-
-- `VITE_API_URL` — API base URL (default: `http://localhost:5050/api`)
-- `VITE_UPLOAD_URL` — Upload base URL (default: `http://localhost:5050`)
-
-## Installation & Development
-
-### Step 1: Install Dependencies
-From the repository root:
 ```bash
 npm run install:all
 ```
 
-Or install individually:
+Or separately:
 
 ```bash
 npm install --prefix backend
 npm install --prefix frontend
 ```
 
-### Step 2: Ensure MongoDB is Running
-**Critical**: MongoDB must be running before starting the backend.
+### 2. Configure environment variables
 
-**macOS (Homebrew)**:
+Create the backend `.env` file in `/backend`.
+
+Example values:
+
+```env
+PORT=5050
+MONGO_URI=mongodb://127.0.0.1:27017/project_management_system
+JWT_SECRET=your_jwt_secret_here
+CLIENT_URL=http://localhost:5173
+```
+
+The frontend can use environment variables if needed, but the default API URL is:
+
+```env
+VITE_API_URL=http://localhost:5050/api
+VITE_UPLOAD_URL=http://localhost:5050
+```
+
+### 3. Start MongoDB
+
+Make sure MongoDB is running before starting the backend.
+
+macOS (Homebrew):
+
 ```bash
 brew services start mongodb-community
 ```
 
-**Verify MongoDB is listening**:
+Verify:
+
 ```bash
 lsof -iTCP:27017 -sTCP:LISTEN -P -n | grep mongod
 ```
 
-### Step 3: Seed Demo Data (Optional)
-Populate database with demo users and projects:
-```bash
-npm run seed --prefix backend
-```
+### 4. Run the app
 
-Demo credentials:
-- **Admin**: `admin@example.com` / `password123`
-- **User**: `user@example.com` / `password123`
+From the repository root:
 
-### Step 4: Start Development Servers
-From the repository root, start both backend and frontend:
 ```bash
 npm run dev
 ```
 
-**Servers**:
-- **Backend**: `http://localhost:5050`
-- **Frontend**: `http://localhost:5173`
+This runs both the backend and frontend together.
 
-**Alternative**: Run separately in different terminals:
+Alternative:
+
 ```bash
-# Terminal 1: Backend
 npm start --prefix backend
-
-# Terminal 2: Frontend
 npm run dev --prefix frontend
 ```
 
-## Production Build
+## Seed data (optional)
 
-**Build frontend** (creates optimized dist folder):
+Use the backend seed script to populate sample users and projects:
+
 ```bash
-npm run build --prefix frontend
+npm run seed --prefix backend
 ```
 
-**Start backend in production mode**:
-```bash
-npm start --prefix backend
+## Backend API Reference
+
+Base URL: `http://localhost:5050/api`
+
+### Auth
+
+- `POST /api/auth/signup`
+  - Register a new user
+  - Body: `name`, `email`, `password`, `role`
+- `POST /api/auth/login`
+  - Authenticate a user
+  - Body: `email`, `password`
+- `GET /api/auth/me`
+  - Get current user profile
+  - Requires auth token
+
+### Users
+
+- `GET /api/users`
+  - List all users
+  - Admin only
+- `POST /api/users`
+  - Create a new user
+  - Admin only
+- `PUT /api/users/profile`
+  - Update current user profile
+  - Requires auth token
+- `PUT /api/users/:id`
+  - Update a user by ID
+  - Admin only
+- `DELETE /api/users/:id`
+  - Delete a user by ID
+  - Admin only
+
+### Projects
+
+- `GET /api/projects`
+  - List projects for the authenticated user
+- `POST /api/projects`
+  - Create a project
+  - Admin only
+  - Supports file uploads: `attachments` (up to 3 files)
+- `GET /api/projects/:id`
+  - Get a single project by ID
+- `PUT /api/projects/:id`
+  - Update a project by ID
+  - Admin only
+  - Supports file uploads: `attachments`
+- `DELETE /api/projects/:id`
+  - Delete a project by ID
+  - Admin only
+- `PATCH /api/projects/:id/status`
+  - Update project status
+  - Requires auth token
+
+### Dashboard
+
+- `GET /api/dashboard`
+  - Fetch dashboard metrics for the current user
+  - Requires auth token
+
+## File Uploads
+
+Uploaded attachments are stored in `/uploads` and served from:
+
+```text
+http://localhost:5050/uploads/<filename>
 ```
 
-Ensure `NODE_ENV=production` and all required environment variables are set in `backend/.env`.
+## Scripts
 
-## API Reference
+- `npm run install:all` — install backend and frontend dependencies
+- `npm run dev` — start both backend and frontend
+- `npm run build --prefix frontend` — build the React app
+- `npm start --prefix backend` — run the backend server
+- `npm run seed --prefix backend` — seed demo data
 
-All endpoints are prefixed with `/api`.
+## Notes
 
-Base URL (development): `http://localhost:5050/api`
+- The backend runs on `http://localhost:5050` by default.
+- The frontend runs on `http://localhost:5173` by default.
+- Set a strong `JWT_SECRET` in `/backend/.env` for production.
+- If you change ports, update the frontend API URL accordingly.
+
+## Contact
+
+For questions, use the project code and inspect `/backend/src` and `/frontend/src` for routes, controllers, and components.
 
 ### Auth
 
