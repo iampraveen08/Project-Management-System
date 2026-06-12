@@ -2,6 +2,16 @@
 
 A full-stack project management app built with React, Vite, Express, and MongoDB. It supports role-based access, user management, project CRUD operations, file uploads, and dashboard analytics.
 
+## Deployment
+
+Frontend : https://project-management-system-1-ungq.onrender.com
+
+Backend : https://project-management-system-sawf.onrender.com
+
+## Document
+
+https://docs.google.com/document/d/1-_YP-Zxg7wlcGietC6q24UBriCifdg_nfd32KQj7mSo/edit?tab=t.0
+
 ## Key Features
 
 - JWT authentication and protected routes
